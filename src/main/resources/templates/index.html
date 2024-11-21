@@ -16,19 +16,24 @@
     <style>
         .borda{
             border: 2px solid black;
-            padding: 10px;
+            padding: 0px;
         }
     </style>
     <title>Controlador</title>
 </head>
 <body>
     <div class="container mt-3 borda">
-        <button id="addBtn" class="btn btn-success"><i class="fa-solid fa-plus"></i></button>
-        <button id="removeBtn" class="btn btn-danger"><i class="fa-solid fa-trash"></i></button>
-        <button id="resetBtn" class="btn btn-secondary"><i class="fa-solid fa-rotate-right"></i></button>
-        <button id="reconnectBtn" class="btn btn-primary"><i class="fa-solid fa-link"></i></button>
-        <hr>
-            <div class="row">
+        <div class="sticky-top px-2 py-2 bg-secondary-subtle border-bottom border-dark border-2 d-flex gap-1">
+            <button id="addBtn" class="btn btn-success"><i class="fa-solid fa-plus"></i></button>
+            <button id="removeBtn" class="btn btn-danger"><i class="fa-solid fa-trash"></i></button>
+            <button id="resetBtn" class="btn btn-secondary"><i class="fa-solid fa-rotate-right"></i></button>
+            <button id="reconnectBtn" class="btn btn-info"><i class="fa-solid fa-link"></i></button>
+            <span id="loading" class="d-none"><i class="fa-solid fa-spinner"> Conectando...</i></span>
+            <span id="check" class="d-none" style="color: #63E6BE;"><i class="fa-solid fa-check"> Conectado!</i></span>
+            <span id="disconnected" class="d-none" style="color: #ea1f1f;"><i class="fa-solid fa-xmark"> Erro!</i></span>
+            <button id="botaoSubmitDados" class="btn btn-primary ms-auto" type="button">Rodar Comandos</button>
+        </div>
+            <div class="row p-2">
                 <div class="col-12">
                     <div class="input-group mt-1">
                         <select name="servo" class="form-select" id="inputGroupSelect04" aria-label="Example select with button addon">
@@ -43,9 +48,6 @@
                     </div>
                     <hr>
                 </div>
-            </div>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button id="botaoSubmitDados" class="btn btn-primary" type="button">Rodar Comandos</button>
             </div>
     </div>
 </body>

@@ -1,6 +1,9 @@
 package com.example.controleGarra.controller;
+
 import com.fazecast.jSerialComm.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +15,9 @@ public class C_ArduinoComm {
 
     private static OutputStream output;
 
-    private SerialPort serialPort;
+    private static SerialPort serialPort;
+    private static BufferedReader input;
+    private static int delay = 450;
 
     public C_ArduinoComm() {
         output = null;
@@ -31,6 +36,11 @@ public class C_ArduinoComm {
             return;
         }
 
+        if (serialPort != null && serialPort.isOpen()) {
+            serialPort.closePort();
+            System.out.println("Porta serial fechada.");
+        }
+
         serialPort = ports[0]; // Use a primeira porta serial encontrada, você pode ajustar isso conforme necessário
 
         if (!serialPort.openPort()) {
@@ -42,10 +52,19 @@ public class C_ArduinoComm {
 
         serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 10000, 0);
 
+        input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
 
-        BufferedReader input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
-
-        output = connectOutput(output, serialPort);
+        try {
+            output = serialPort.getOutputStream();
+            if (output == null) {
+                System.out.println("Falha ao obter o OutputStream.");
+            } else {
+                System.out.println("OutputStream obtido com sucesso. Porta aberta: " + serialPort.getDescriptivePortName());
+            }
+        } catch (Exception e) {
+            // Tratamento de erro, caso a obtenção do OutputStream falhe
+            System.out.println("Erro ao obter OutputStream: " + e.getMessage());
+        }
 
         try {
             Thread.sleep(3000);
@@ -58,73 +77,116 @@ public class C_ArduinoComm {
         return output;
     }
 
-    public static void enviarComando(OutputStream output, int servo, int angulo){
+    public static BufferedReader getInput() {
+        return input;
+    }
+
+    public static void enviarComando(OutputStream output, int servo, int angulo) {
         try {
             output.write(servo);
             output.flush();
-            try{Thread.sleep(300);} catch (Exception e){}
+
+            Thread.sleep(delay);
 
             output.write(angulo);
             output.flush();
-            try{Thread.sleep(300);} catch (Exception e){}
+
+            Thread.sleep(delay + 150);
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static void resetarBraco(OutputStream output){
-        try{
+    public static void resetarBraco(OutputStream output) {
+        try {
             output.write(11);
             output.flush();
-            try{Thread.sleep(300);} catch (Exception e){}
+            try {
+                Thread.sleep(delay);
+            } catch (Exception e) {
+            }
 
             output.write(0);
             output.flush();
-            try{Thread.sleep(300);} catch (Exception e){}
+            try {
+                Thread.sleep(delay + 150);
+            } catch (Exception e) {
+            }
 
             output.write(12);
             output.flush();
-            try{Thread.sleep(300);} catch (Exception e){}
+            try {
+                Thread.sleep(delay);
+            } catch (Exception e) {
+            }
 
             output.write(0);
             output.flush();
-            try{Thread.sleep(300);} catch (Exception e){}
+            try {
+                Thread.sleep(delay + 150);
+            } catch (Exception e) {
+            }
 
-            for(int i = 3; i < 5; i++){
+            for (int i = 3; i < 5; i++) {
                 output.write(i);
                 output.flush();
-                try{Thread.sleep(300);} catch (Exception e){}
+                try {
+                    Thread.sleep(delay);
+                } catch (Exception e) {
+                }
 
                 output.write(0);
                 output.flush();
-                try{Thread.sleep(300);} catch (Exception e){}
+                try {
+                    Thread.sleep(delay +150);
+                } catch (Exception e) {
+                }
             }
 
             output.write(5);
             output.flush();
-            try{Thread.sleep(300);} catch (Exception e){}
+            try {
+                Thread.sleep(delay);
+            } catch (Exception e) {
+            }
 
             output.write(45);
             output.flush();
-            try{Thread.sleep(300);} catch (Exception e){}
+            try {
+                Thread.sleep(delay + 150);
+            } catch (Exception e) {
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static OutputStream connectOutput(OutputStream output, SerialPort serialPort){
-        try {
-            output = serialPort.getOutputStream();
-            if (output == null) {
-                System.out.println("Falha ao obter o OutputStream.");
-            } else {
-                System.out.println("OutputStream obtido com sucesso.");
-                return output;
+    @PostMapping("/reconnect")
+    @ResponseBody
+    private String reconnect() {
+        int attempts = 0;
+        int maxAttempts = 3;
+        int waitTimeMs = 50;
+        while (attempts < maxAttempts) {
+            System.out.println("Tentando reconectar à porta serial... (tentativa " + (attempts + 1) + ")");
+            initialize();
+
+            if (serialPort != null && serialPort.isOpen()) {
+                System.out.println("Reconexão bem-sucedida.");
+                return "top";
             }
-        } catch (Exception e) {
-            // Tratamento de erro, caso a obtenção do OutputStream falhe
-            System.out.println("Erro ao obter OutputStream: " + e.getMessage());
+
+            attempts++;
+            try {
+                Thread.sleep(waitTimeMs);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+
+        System.out.println("Não foi possível reconectar após " + maxAttempts + " tentativas.");
+        return "paia";
     }
 }

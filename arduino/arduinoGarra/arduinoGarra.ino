@@ -8,6 +8,7 @@ Servo servo5;
 
 int portaServo = 0;
 int anguloServo = 0;
+int espera = 450;
 
 void setup() {
   Serial.begin(9600);
@@ -43,53 +44,55 @@ void setup() {
 }
 
 void loop() {
+  Serial.begin(9600);
   if(Serial.available() > 0){
     portaServo = Serial.read();
     switch(portaServo){
       case 11:
-        delay(300);
+        delay(espera);
         if(Serial.available() > 0){
           anguloServo = Serial.read();
           servo1.write(anguloServo);
-          delay(300);
+          delay(espera);
         }
         break;
       case 12:
-        delay(300);
+        delay(espera);
         if(Serial.available() > 0){
           anguloServo = Serial.read();
           servo2.write(anguloServo);
-          delay(300);
+          delay(espera);
         }
         break;
       case 3:
-        delay(300);
+        delay(espera);
         if(Serial.available() > 0){
           anguloServo = Serial.read();
           servo3.write(anguloServo);
-          delay(300);
+          delay(espera);
         }
         break;
       case 4:
-        delay(300);
+        delay(espera);
         if(Serial.available() > 0){
           anguloServo = Serial.read();
           servo4.write(anguloServo);
-          delay(300);
+          delay(espera);
         }
         break;
       case 5:
-        delay(300);
+        delay(espera);
         if(Serial.available() > 0){
           anguloServo = Serial.read();
           servo5.write(anguloServo);
-          delay(300);
+          delay(espera);
         }
         break;
     }
 
     portaServo = 0;
     anguloServo = 0;
+    Serial.end();
   }
-  delay(50);
+  delay(150);
 }

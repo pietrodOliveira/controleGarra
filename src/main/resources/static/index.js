@@ -41,6 +41,33 @@ function resetarBraco(){
 }
 $("#resetBtn").click(resetarBraco);
 
+function reconnect(){
+    $("#loading").removeClass("d-none");
+    $("#disconnected").addClass("d-none");
+    $("#check").addClass("d-none");
+
+    $.ajax({
+        url: "/reconnect",
+        method: "post",
+        success: function(response){
+            if(response == "top"){
+                $("#loading").addClass("d-none");
+                $("#check").removeClass("d-none");
+                $("#disconnected").addClass("d-none");
+            }else{
+                $("#loading").addClass("d-none");
+                $("#check").addClass("d-none");
+                $("#disconnected").removeClass("d-none");
+            }
+        },
+        error: function(xhr, status, error){
+            console.log("Erro ao tentar reconectar", status, error);
+            $("#disconnected").removeClass("d-none");
+        }
+    });
+}
+$("#reconnectBtn").click(reconnect);
+
 $('#botaoSubmitDados').on('click', function(e) {
     e.preventDefault(); // Evita o envio normal do formulário
 

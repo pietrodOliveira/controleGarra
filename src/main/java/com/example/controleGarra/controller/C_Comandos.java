@@ -29,7 +29,7 @@ public class C_Comandos {
 
                     C_ArduinoComm.enviarComando(C_ArduinoComm.getOutput() ,servo, angulo);
 
-                    Thread.sleep(600);
+                    Thread.sleep(1000);
                 }
             }
             return ResponseEntity.ok("Comando executado com sucesso");
