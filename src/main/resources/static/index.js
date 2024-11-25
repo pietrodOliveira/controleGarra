@@ -50,7 +50,7 @@ function reconnect(){
         url: "/reconnect",
         method: "post",
         success: function(response){
-            if(response == "top"){
+            if(response == 1){
                 $("#loading").addClass("d-none");
                 $("#check").removeClass("d-none");
                 $("#disconnected").addClass("d-none");

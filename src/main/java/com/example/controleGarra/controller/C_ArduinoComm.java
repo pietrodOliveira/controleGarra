@@ -9,6 +9,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class C_ArduinoComm {
@@ -17,28 +21,18 @@ public class C_ArduinoComm {
 
     private static SerialPort serialPort;
     private static BufferedReader input;
-    private static int delay = 450;
+    private static int delay = 600;
 
     public C_ArduinoComm() {
         output = null;
     }
 
-    public static void main(String[] args) {
-        C_ArduinoComm arduino = new C_ArduinoComm();
-        arduino.initialize();
-    }
-
-    public void initialize() {
+    public static void initialize() {
         SerialPort[] ports = SerialPort.getCommPorts();
 
         if (ports.length == 0) {
             System.out.println("Nenhuma porta serial encontrada.");
             return;
-        }
-
-        if (serialPort != null && serialPort.isOpen()) {
-            serialPort.closePort();
-            System.out.println("Porta serial fechada.");
         }
 
         serialPort = ports[0]; // Use a primeira porta serial encontrada, você pode ajustar isso conforme necessário
@@ -51,8 +45,6 @@ public class C_ArduinoComm {
         serialPort.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
 
         serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 10000, 0);
-
-        input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
 
         try {
             output = serialPort.getOutputStream();
@@ -73,25 +65,18 @@ public class C_ArduinoComm {
         }
     }
 
-    public static OutputStream getOutput() {
-        return output;
+    public static void DesconectarPortaSerial(){
+        if (serialPort != null && serialPort.isOpen()) {
+            serialPort.closePort();
+            System.out.println("Porta serial fechada.");
+        }
     }
 
-    public static BufferedReader getInput() {
-        return input;
-    }
-
-    public static void enviarComando(OutputStream output, int servo, int angulo) {
+    public static void enviarComando(int servo, int angulo) {
         try {
-            output.write(servo);
+            output.write((servo + ";" + angulo).getBytes());
             output.flush();
-
             Thread.sleep(delay);
-
-            output.write(angulo);
-            output.flush();
-
-            Thread.sleep(delay + 150);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -99,73 +84,47 @@ public class C_ArduinoComm {
         }
     }
 
-    public static void resetarBraco(OutputStream output) {
-        try {
-            output.write(11);
-            output.flush();
-            try {
-                Thread.sleep(delay);
-            } catch (Exception e) {
-            }
+    @PostMapping("/reset")
+    private String postReset() throws InterruptedException {
+        resetarBraco();
 
-            output.write(0);
-            output.flush();
-            try {
-                Thread.sleep(delay + 150);
-            } catch (Exception e) {
-            }
+        return "index";
+    }
 
-            output.write(12);
-            output.flush();
-            try {
-                Thread.sleep(delay);
-            } catch (Exception e) {
-            }
+    public static void resetarBraco() {
+        List<Map<String, Object>> comandos = new ArrayList<>();
 
-            output.write(0);
-            output.flush();
-            try {
-                Thread.sleep(delay + 150);
-            } catch (Exception e) {
-            }
+        Map<String, Object> comando1 = new HashMap<>();
+        comando1.put("motor", 11);
+        comando1.put("angulo", 0);
+        comandos.add(comando1);
 
-            for (int i = 3; i < 5; i++) {
-                output.write(i);
-                output.flush();
-                try {
-                    Thread.sleep(delay);
-                } catch (Exception e) {
-                }
+        Map<String, Object> comando2 = new HashMap<>();
+        comando2.put("motor", 12);
+        comando2.put("angulo", 0);
+        comandos.add(comando2);
 
-                output.write(0);
-                output.flush();
-                try {
-                    Thread.sleep(delay +150);
-                } catch (Exception e) {
-                }
-            }
+        Map<String, Object> comando3 = new HashMap<>();
+        comando3.put("motor", 3);
+        comando3.put("angulo", 0);
+        comandos.add(comando3);
 
-            output.write(5);
-            output.flush();
-            try {
-                Thread.sleep(delay);
-            } catch (Exception e) {
-            }
+        Map<String, Object> comando4 = new HashMap<>();
+        comando4.put("motor", 4);
+        comando4.put("angulo", 0);
+        comandos.add(comando4);
 
-            output.write(45);
-            output.flush();
-            try {
-                Thread.sleep(delay + 150);
-            } catch (Exception e) {
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Map<String, Object> comando5 = new HashMap<>();
+        comando5.put("motor", 5);
+        comando5.put("angulo", 45);
+        comandos.add(comando5);
+
+        C_Comandos.RodarComandos(comandos);
     }
 
     @PostMapping("/reconnect")
     @ResponseBody
-    private String reconnect() {
+    private int reconnect() {
         int attempts = 0;
         int maxAttempts = 3;
         int waitTimeMs = 50;
@@ -175,7 +134,7 @@ public class C_ArduinoComm {
 
             if (serialPort != null && serialPort.isOpen()) {
                 System.out.println("Reconexão bem-sucedida.");
-                return "top";
+                return 1;
             }
 
             attempts++;
@@ -187,6 +146,6 @@ public class C_ArduinoComm {
         }
 
         System.out.println("Não foi possível reconectar após " + maxAttempts + " tentativas.");
-        return "paia";
+        return 0;
     }
 }

@@ -9,8 +9,6 @@ public class ControleGarraApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ControleGarraApplication.class, args);
-		C_ArduinoComm c_arduinoComm = new C_ArduinoComm();
-		c_arduinoComm.main(args);
 	}
 
 }
