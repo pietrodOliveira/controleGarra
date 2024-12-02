@@ -59,13 +59,13 @@ public class C_ArduinoComm {
         }
 
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public static void DesconectarPortaSerial(){
+    public static void DesconectarPortaSerial() {
         if (serialPort != null && serialPort.isOpen()) {
             serialPort.closePort();
             System.out.println("Porta serial fechada.");
@@ -109,10 +109,10 @@ public class C_ArduinoComm {
         comando3.put("angulo", 0);
         comandos.add(comando3);
 
-        Map<String, Object> comando4 = new HashMap<>();
+        /*Map<String, Object> comando4 = new HashMap<>();
         comando4.put("motor", 4);
         comando4.put("angulo", 0);
-        comandos.add(comando4);
+        comandos.add(comando4);*/
 
         Map<String, Object> comando5 = new HashMap<>();
         comando5.put("motor", 5);

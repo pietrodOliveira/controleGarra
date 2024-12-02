@@ -14,24 +14,24 @@ import java.util.Map;
 public class C_Comandos {
     @PostMapping("/garra")
     @ResponseBody
-    private ResponseEntity<String> postGarra(@RequestBody List<Map<String, Object>> motorAngulos){
-       return RodarComandos(motorAngulos);
+    private ResponseEntity<String> postGarra(@RequestBody List<Map<String, Object>> motorAngulos) {
+        return RodarComandos(motorAngulos);
     }
 
     @PostMapping("/getPv")
-    private String postPv(){
+    private String postPv() {
         return "pv/top";
     }
 
-    public static ResponseEntity<String> RodarComandos(List<Map<String, Object>> motorAngulos){
-        try{
+    public static ResponseEntity<String> RodarComandos(List<Map<String, Object>> motorAngulos) {
+        try {
             C_ArduinoComm.initialize();
-            for(Map<String, Object> comando : motorAngulos){
-                if(!comando.get("motor").toString().isEmpty() && !comando.get("angulo").toString().isEmpty()){
+            for (Map<String, Object> comando : motorAngulos) {
+                if (!comando.get("motor").toString().isEmpty() && !comando.get("angulo").toString().isEmpty()) {
                     int servo = Integer.parseInt(comando.get("motor").toString());
                     int angulo = Integer.parseInt(comando.get("angulo").toString());
 
-                    System.out.println("Comando: "+servo+";"+angulo);
+                    System.out.println("Comando: " + servo + ";" + angulo);
 
                     C_ArduinoComm.enviarComando(servo, angulo);
 
@@ -40,7 +40,7 @@ public class C_Comandos {
             }
             C_ArduinoComm.DesconectarPortaSerial();
             return ResponseEntity.ok("Comando executado com sucesso");
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Erro ao enviar comandos");
         }

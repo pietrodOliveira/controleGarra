@@ -97,7 +97,6 @@ $('#botaoSubmitDados').on('click', function(e) {
          },
          error: function(xhr, status, error) {
             console.error('Erro ao enviar dados: ', error);
-
          }
     });
 });
