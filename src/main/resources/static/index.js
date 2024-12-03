@@ -28,20 +28,28 @@ function removeCampo(){
 $("#removeBtn").click(removeCampo);
 
 function resetarBraco(){
+    $("#resetBtn").attr("disabled", true);
+    $("#botaoSubmitDados").attr("disabled", true);
+
     $.ajax({
         url: "/reset",
         method: "post",
         success: function(response){
             console.log("Reset enviado", response);
+            $("#resetBtn").removeAttr("disabled");
+            $("#botaoSubmitDados").removeAttr("disabled");
         },
         error: function(){
             console.log("Erro", error);
+            $("#resetBtn").removeAttr("disabled");
+            $("#botaoSubmitDados").removeAttr("disabled");
         }
     })
 }
 $("#resetBtn").click(resetarBraco);
 
 function reconnect(){
+    $("#reconnectBtn").attr("disabled", true);
     $("#loading").removeClass("d-none");
     $("#disconnected").addClass("d-none");
     $("#check").addClass("d-none");
@@ -54,21 +62,26 @@ function reconnect(){
                 $("#loading").addClass("d-none");
                 $("#check").removeClass("d-none");
                 $("#disconnected").addClass("d-none");
+                $("#reconnectBtn").removeAttr("disabled");
             }else{
                 $("#loading").addClass("d-none");
                 $("#check").addClass("d-none");
                 $("#disconnected").removeClass("d-none");
+                $("#reconnectBtn").removeAttr("disabled");
             }
         },
         error: function(xhr, status, error){
             console.log("Erro ao tentar reconectar", status, error);
             $("#disconnected").removeClass("d-none");
+            $("#reconnectBtn").removeAttr("disabled");
         }
     });
 }
 $("#reconnectBtn").click(reconnect);
 
 $('#botaoSubmitDados').on('click', function(e) {
+    $("#botaoSubmitDados").attr("disabled", true);
+    $("#resetBtn").attr("disabled", true);
     e.preventDefault(); // Evita o envio normal do formulário
 
     // Cria um array ou objeto para armazenar os dados a serem enviados
@@ -94,9 +107,13 @@ $('#botaoSubmitDados').on('click', function(e) {
          data: JSON.stringify(dados),  // Envia os dados como uma string JSON
          success: function(response) {
             console.log('Resposta do servidor: ', response);
+            $("#botaoSubmitDados").removeAttr("disabled");
+            $("#resetBtn").removeAttr("disabled");
          },
          error: function(xhr, status, error) {
             console.error('Erro ao enviar dados: ', error);
+            $("#botaoSubmitDados").removeAttr("disabled");
+            $("#resetBtn").removeAttr("disabled");
          }
     });
 });

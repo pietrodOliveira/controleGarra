@@ -12,6 +12,8 @@ import java.util.Map;
 
 @Controller
 public class C_Comandos {
+    private static boolean isRunning = false;
+
     @PostMapping("/garra")
     @ResponseBody
     private ResponseEntity<String> postGarra(@RequestBody List<Map<String, Object>> motorAngulos) {
@@ -25,24 +27,29 @@ public class C_Comandos {
 
     public static ResponseEntity<String> RodarComandos(List<Map<String, Object>> motorAngulos) {
         try {
-            C_ArduinoComm.initialize();
-            for (Map<String, Object> comando : motorAngulos) {
-                if (!comando.get("motor").toString().isEmpty() && !comando.get("angulo").toString().isEmpty()) {
-                    int servo = Integer.parseInt(comando.get("motor").toString());
-                    int angulo = Integer.parseInt(comando.get("angulo").toString());
+            if(!isRunning) {
+                isRunning = true;
+                C_ArduinoComm.initialize();
+                for (Map<String, Object> comando : motorAngulos) {
+                    if (!comando.get("motor").toString().isEmpty() && !comando.get("angulo").toString().isEmpty() && isRunning) {
+                        int servo = Integer.parseInt(comando.get("motor").toString());
+                        int angulo = Integer.parseInt(comando.get("angulo").toString());
 
-                    System.out.println("Comando: " + servo + ";" + angulo);
+                        System.out.println("Comando: " + servo + ";" + angulo);
 
-                    C_ArduinoComm.enviarComando(servo, angulo);
+                        C_ArduinoComm.enviarComando(servo, angulo);
 
-                    Thread.sleep(1000);
+                        Thread.sleep(1000);
+                    }
                 }
+                C_ArduinoComm.DesconectarPortaSerial();
+                isRunning = false;
+                return ResponseEntity.ok("Comando executado com sucesso");
             }
-            C_ArduinoComm.DesconectarPortaSerial();
-            return ResponseEntity.ok("Comando executado com sucesso");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Erro ao enviar comandos");
         }
+        return ResponseEntity.status(500).body("Erro ao enviar comandos");
     }
 }

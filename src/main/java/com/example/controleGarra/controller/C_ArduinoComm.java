@@ -109,10 +109,10 @@ public class C_ArduinoComm {
         comando3.put("angulo", 0);
         comandos.add(comando3);
 
-        /*Map<String, Object> comando4 = new HashMap<>();
+        Map<String, Object> comando4 = new HashMap<>();
         comando4.put("motor", 4);
         comando4.put("angulo", 0);
-        comandos.add(comando4);*/
+        comandos.add(comando4);
 
         Map<String, Object> comando5 = new HashMap<>();
         comando5.put("motor", 5);
