@@ -11,7 +11,7 @@ int posServo1 = 0;  // Valor inicial (exemplo)
 int posServo2 = 0;
 int posServo3 = 0;
 int posServo4 = 0;
-int posServo5 = 45;
+int posServo5 = 0;
 
 void setup() {
   Serial.begin(9600);

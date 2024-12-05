@@ -116,7 +116,7 @@ public class C_ArduinoComm {
 
         Map<String, Object> comando5 = new HashMap<>();
         comando5.put("motor", 5);
-        comando5.put("angulo", 45);
+        comando5.put("angulo", 0);
         comandos.add(comando5);
 
         C_Comandos.RodarComandos(comandos);
